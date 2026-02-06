@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeCheckBot — Know What's Happening in Your Discord Community</title>
+<meta name="description" content="Know exactly what's happening in your Discord community — before problems grow. AI-powered tone analysis and harmful behavior detection.">
+
+<!-- Open Graph / Social Sharing -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="VibeCheckBot — AI-Powered Discord Community Health">
+<meta property="og:description" content="Know exactly what's happening in your Discord community — before problems grow. AI-powered tone analysis and harmful behavior detection.">
+<meta property="og:url" content="https://www.vibecheckbot.com">
+<meta property="og:site_name" content="VibeCheckBot">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="VibeCheckBot — AI-Powered Discord Community Health">
+<meta name="twitter:description" content="Know exactly what's happening in your Discord community — before problems grow.">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%230A0A0A'/%3E%3Ctext x='4' y='32' font-family='sans-serif' font-weight='900' font-size='28' fill='%23F97316'%3EV%3C/text%3E%3Ctext x='20' y='32' font-family='sans-serif' font-weight='900' font-size='28' fill='white'%3EC%3C/text%3E%3C/svg%3E">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #F97316;
+  --orange-hover: #FB923C;
+  --orange-glow: rgba(249, 115, 22, 0.3);
+  --purple: #A78BFA;
+  --purple-dim: rgba(167, 139, 250, 0.15);
+  --bg-primary: #0A0A0A;
+  --bg-card: #141414;
+  --bg-card-border: #2A2A2A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A3A3A3;
+  --text-dim: #8A8A8A;
+  --discord-dark: #1E1F22;
+  --discord-chat: #313338;
+  --discord-blurple: #5865F2;
+  --discord-green: #57F287;
+  --discord-text: #DBDEE1;
+  --discord-muted: #949BA4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--orange) var(--bg-primary)}
+body{font-family:'Outfit',sans-serif;background:var(--bg-primary);color:var(--text-primary);overflow-x:hidden;line-height:1.6}
+.bg-glow{position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 30%,rgba(249,115,22,0.04) 0%,transparent 50%),radial-gradient(circle at 70% 70%,rgba(167,139,250,0.03) 0%,transparent 50%);animation:bgFloat 20s ease-in-out infinite;pointer-events:none;z-index:0}
+@keyframes bgFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(-2%,-2%)}}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:1000;padding:0.8rem 2rem;background:rgba(10,10,10,0.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.05);transition:all 0.3s}
+nav.scrolled{padding:0.6rem 2rem;background:rgba(10,10,10,0.95)}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.nav-logo-wrap{display:flex;align-items:center;gap:0.6rem;text-decoration:none;cursor:pointer}
+.nav-logo-text{font-weight:900;font-size:1.3rem;color:var(--text-primary);letter-spacing:-0.5px}
+.nav-logo-text span{color:var(--orange)}
+.nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center}
+.nav-links a{color:var(--text-secondary);text-decoration:none;font-size:0.85rem;font-weight:500;transition:color 0.3s;cursor:pointer}
+.nav-links a:hover,.nav-links a.active-tab{color:var(--orange)}
+.nav-cta{background:var(--orange)!important;color:var(--bg-primary)!important;padding:0.45rem 1rem;border-radius:8px;font-weight:600!important;transition:all 0.3s!important}
+.nav-cta:hover{background:var(--orange-hover)!important;transform:translateY(-1px);box-shadow:0 4px 20px var(--orange-glow)}
+.nav-social{background:rgba(167,139,250,0.15)!important;color:var(--purple)!important;padding:0.45rem 1rem;border-radius:8px;font-weight:600!important;border:1px solid rgba(167,139,250,0.3)!important;transition:all 0.3s!important;font-size:0.8rem!important}
+.nav-social:hover{background:rgba(167,139,250,0.25)!important;transform:translateY(-1px)}
+.mobile-toggle{display:none;background:none;border:none;color:var(--text-primary);font-size:1.5rem;cursor:pointer}
+
+/* PAGE TABS */
+.page-tab{display:none}
+.page-tab.active{display:block}
+
+/* SECTIONS */
+section{position:relative;z-index:1;padding:3rem 2rem}
+.container{max-width:1200px;margin:0 auto}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}.reveal-delay-4{transition-delay:0.4s}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;padding-top:4.5rem;padding-bottom:2rem}
+.hero-grid{max-width:780px;margin:0 auto;text-align:center}
+.hero-badge{display:inline-block;padding:0.4rem 1rem;background:var(--purple-dim);border:1px solid rgba(167,139,250,0.3);border-radius:50px;font-size:0.85rem;color:var(--purple);font-weight:500;margin-bottom:1.2rem;animation:fadeInDown 0.8s ease}
+.hero-title{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.05;letter-spacing:-2px;margin-bottom:1rem;animation:fadeInUp 0.8s ease 0.2s both}
+.hero-title .highlight{background:linear-gradient(135deg,var(--orange),#FBBF24);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-subtitle{font-size:1.1rem;color:var(--text-secondary);margin-bottom:1.5rem;animation:fadeInUp 0.8s ease 0.4s both}
+.hero-buttons{display:flex;gap:1rem;flex-wrap:wrap;animation:fadeInUp 0.8s ease 0.6s both;justify-content:center}
+.hero-trust{margin-top:1.2rem;color:var(--text-dim);font-size:0.85rem;animation:fadeInUp 0.8s ease 0.8s both}
+.hero-trust span{margin:0 0.3rem}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+
+/* LOGO */
+.logo-large{display:flex;align-items:center;gap:0.8rem;margin-bottom:1.5rem;animation:fadeInUp 0.8s ease both;justify-content:center}
+.logo-text-lg{font-weight:900;font-size:2.2rem;color:var(--text-primary);letter-spacing:-1px}
+.logo-text-lg span{color:var(--orange)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.8rem 1.8rem;border-radius:10px;font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:all 0.3s ease}
+.btn-primary{background:var(--orange);color:var(--bg-primary)}
+.btn-primary:hover{background:var(--orange-hover);transform:translateY(-2px);box-shadow:0 8px 30px var(--orange-glow)}
+.btn-secondary{background:transparent;color:var(--text-primary);border:1px solid var(--bg-card-border)}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-2px)}
+.btn-social{background:rgba(167,139,250,0.12);color:var(--purple);border:1px solid rgba(167,139,250,0.3)}
+.btn-social:hover{background:rgba(167,139,250,0.2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(167,139,250,0.15)}
+.section-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-1px;margin-bottom:0.8rem}
+.section-subtitle{color:var(--text-secondary);font-size:1rem;max-width:600px}
+
+/* CLARITY + MOCKUPS */
+.clarity-features{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin:2rem 0 2.5rem}
+.clarity-item{display:flex;gap:0;align-items:flex-start}
+.clarity-item h3{font-weight:700;font-size:0.95rem;margin-bottom:0.2rem}
+.clarity-item p{color:var(--text-secondary);font-size:0.85rem}
+.mockups-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
+
+/* DISCORD MOCKUP */
+.discord-mockup-lg{background:var(--discord-chat);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.dm-header{background:var(--discord-dark);padding:0.8rem 1.2rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid rgba(255,255,255,0.05)}
+.dm-hash{color:var(--discord-muted);font-size:1.2rem;font-weight:700}
+.dm-channel{color:var(--discord-text);font-weight:700;font-size:1rem}
+.dm-body{padding:1.2rem;display:flex;flex-direction:column;gap:1rem}
+.dm-msg{display:flex;gap:0.8rem;align-items:flex-start}
+.dm-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:700;color:#fff}
+.dm-msg-inner{flex:1}
+.dm-name{font-weight:700;font-size:0.9rem;margin-bottom:0.2rem}
+.dm-bot{background:var(--discord-blurple);color:#fff;font-size:0.6rem;padding:0.1rem 0.35rem;border-radius:3px;margin-left:0.4rem;font-weight:600;vertical-align:middle}
+.dm-text{color:var(--discord-text);font-size:0.9rem;line-height:1.5}
+.dm-embed{margin-top:0.6rem;background:rgba(0,0,0,0.25);border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding:1rem 1.2rem}
+.dm-embed-title{color:var(--orange);font-weight:700;font-size:1rem;margin-bottom:0.8rem}
+.dm-field-label{color:var(--discord-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.15rem}
+.dm-score{font-size:1.8rem;font-weight:900;color:#22C55E;margin-bottom:0.3rem}
+.dm-dot-green{color:#22C55E;font-size:1.2rem}
+.dm-vibe-bar{height:8px;border-radius:4px;background:rgba(255,255,255,0.1);margin-bottom:1rem;overflow:hidden}
+.dm-vibe-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#EF4444,#F97316,#22C55E);width:0%;transition:width 1.5s ease}
+.dm-fields-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem}
+.dm-field-val{color:var(--discord-text);font-size:1rem;font-weight:600}
+.dm-footer{color:var(--discord-muted);font-size:0.7rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(255,255,255,0.05)}
+
+/* DASHBOARD */
+.dash-lg{background:var(--bg-card);border-radius:14px;overflow:hidden;border:1px solid var(--bg-card-border);box-shadow:0 20px 60px rgba(0,0,0,0.4)}
+.dash-lg-topbar{background:rgba(0,0,0,0.3);padding:0.6rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bg-card-border)}
+.dash-lg-dots{display:flex;gap:7px}
+.ddot{width:11px;height:11px;border-radius:50%;display:inline-block}
+.dash-lg-title{color:var(--text-dim);font-size:0.85rem;font-weight:500}
+.dash-lg-body{padding:1.5rem}
+.dash-lg-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem}
+.dash-lg-header h3{font-size:1.2rem;font-weight:800}
+.dash-lg-badge{background:rgba(34,197,94,0.15);color:#22C55E;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.8rem;font-weight:600}
+.dash-lg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.dash-lg-stat{background:rgba(255,255,255,0.03);border:1px solid var(--bg-card-border);border-radius:12px;padding:1rem;text-align:center}
+.dash-lg-num{font-size:1.8rem;font-weight:800}
+.dash-lg-label{font-size:0.75rem;color:var(--text-dim);margin-top:0.2rem}
+.dash-lg-ch-label{font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.8rem}
+.dash-lg-ch{display:flex;align-items:center;gap:0.8rem;padding:0.5rem 0}
+.dash-lg-ch-name{font-size:0.9rem;color:var(--text-secondary);width:80px;flex-shrink:0}
+.dash-lg-bar-bg{flex:1;height:10px;background:rgba(255,255,255,0.05);border-radius:5px;overflow:hidden}
+.dash-lg-bar{height:100%;border-radius:5px;transition:width 1.5s ease;width:0}
+.dash-lg-ch-score{font-size:0.9rem;font-weight:700;width:35px;text-align:right}
+.bar-green{background:linear-gradient(90deg,#22C55E,#4ADE80)}
+.bar-yellow{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+.bar-red{background:linear-gradient(90deg,#EF4444,#F87171)}
+
+/* PAIN */
+.pain-flow{max-width:650px;margin:0 auto;position:relative}
+.pain-row{display:flex;align-items:flex-start;gap:1.2rem;padding:0.8rem 0;position:relative}
+.pain-num{width:10px;height:10px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:0.5rem}
+.pain-line{position:absolute;left:4px;top:2rem;bottom:-0.8rem;width:2px;background:linear-gradient(180deg,rgba(249,115,22,0.3),transparent)}
+.pain-row:last-child .pain-line{display:none}
+.pain-content h3{font-weight:700;font-size:1.05rem;margin-bottom:0.3rem;color:var(--text-primary)}
+.pain-content p{color:var(--text-secondary);font-size:0.9rem;line-height:1.6}
+.pain-row:hover .pain-content h3{color:var(--orange);transition:color 0.3s}
+
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem 4rem;margin-top:2.5rem}
+.feat-item{padding:0}
+.feat-svg{margin-bottom:0.8rem;opacity:0.9}
+.feat-item h3{font-weight:700;font-size:1.05rem;margin-bottom:0.3rem}
+.feat-item p{color:var(--text-secondary);font-size:0.9rem}
+.feat-item:hover .feat-svg{opacity:1}
+.feat-item:hover h3{color:var(--orange);transition:color 0.3s}
+
+/* STEPS */
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem;position:relative}
+.steps-grid::before{content:'';position:absolute;top:35px;left:15%;right:15%;height:2px;background:linear-gradient(90deg,var(--orange),var(--purple),var(--orange));opacity:0.3}
+.step-card{text-align:center;position:relative}
+.step-number{width:54px;height:54px;border-radius:50%;background:var(--bg-card);border:2px solid var(--orange);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-weight:800;font-size:1.2rem;color:var(--orange);position:relative;z-index:2;transition:all 0.3s}
+.step-card:hover .step-number{background:var(--orange);color:var(--bg-primary);box-shadow:0 0 30px var(--orange-glow)}
+.step-card h3{font-weight:700;margin-bottom:0.4rem;font-size:0.95rem}
+.step-card p{color:var(--text-secondary);font-size:0.85rem;max-width:260px;margin:0 auto}
+.step-code{font-family:'JetBrains Mono',monospace;background:var(--bg-card);border:1px solid var(--bg-card-border);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.82rem;color:var(--orange)}
+
+/* CHART */
+.chart-container{margin-top:2rem;padding:2rem;background:var(--bg-card);border:1px solid var(--bg-card-border);border-radius:16px}
+.chart-svg{width:100%;height:100%}
+.chart-line{stroke:var(--orange);stroke-width:3;fill:none;stroke-dasharray:500;stroke-dashoffset:500;transition:stroke-dashoffset 2s ease}
+.chart-line.animated{stroke-dashoffset:0}
+.chart-fill{fill:url(#orangeGradient);opacity:0;transition:opacity 1.5s ease 0.5s}
+.chart-fill.animated{opacity:1}
+.chart-dot{fill:var(--orange);r:6;opacity:0;transition:opacity 0.3s ease}
+.chart-dot.animated{opacity:1}
+.chart-dot:nth-child(2){transition-delay:0.5s}.chart-dot:nth-child(3){transition-delay:1s}.chart-dot:nth-child(4){transition-delay:1.5s}
+.stats-row{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem}
+.stat-item{text-align:center;padding:0.8rem 1.2rem;background:rgba(249,115,22,0.05);border:1px solid rgba(249,115,22,0.15);border-radius:12px}
+.stat-value{font-size:1.3rem;font-weight:800}
+.stat-value.green{color:#22C55E}.stat-value.red{color:#EF4444}.stat-value.blue{color:#60A5FA}
+.stat-label{color:var(--text-secondary);font-size:0.75rem;margin-top:0.2rem}
+
+/* COMMUNITY */
+.comm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem}
+.comm-box{border:1.5px solid var(--orange);border-radius:14px;padding:1.5rem 1.5rem 1.2rem;transition:all 0.3s ease;position:relative}
+.comm-box:hover{background:rgba(249,115,22,0.04);transform:translateY(-2px);box-shadow:0 8px 30px rgba(249,115,22,0.1)}
+.comm-icon-circle{width:48px;height:48px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;color:var(--bg-primary)}
+.comm-box h3{font-weight:700;font-size:0.95rem;margin-bottom:0.3rem}
+.comm-box p{color:var(--text-secondary);font-size:0.85rem}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;align-items:start}
+.pricing-card{padding:2rem 1.5rem;background:var(--bg-card);border:1px solid var(--bg-card-border);border-radius:16px;transition:all 0.4s ease;position:relative}
+.pricing-card:hover{transform:translateY(-3px)}
+.pricing-card.featured{border-color:var(--orange);background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(249,115,22,0.02));transform:scale(1.04)}
+.pricing-card.featured:hover{transform:scale(1.04) translateY(-3px)}
+.pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--orange);color:var(--bg-primary);padding:0.25rem 0.9rem;border-radius:50px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.pricing-name{font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:0.4rem}
+.pricing-price{font-size:2.2rem;font-weight:900;margin-bottom:0.2rem}
+.pricing-period{color:var(--text-dim);font-size:0.8rem;margin-bottom:1.2rem}
+.pricing-features{list-style:none;margin-bottom:1.5rem}
+.pricing-features li{padding:0.4rem 0;color:var(--text-secondary);font-size:0.85rem;display:flex;align-items:center;gap:0.5rem}
+.pricing-features li::before{content:'✓';color:var(--orange);font-weight:700}
+.pricing-card .btn{width:100%;justify-content:center;font-size:0.9rem;padding:0.7rem 1.5rem}
+
+/* LANDING FAQ */
+.faq-list{max-width:700px;margin:2rem auto 0}
+.faq-item{border-bottom:1px solid var(--bg-card-border)}
+.faq-question{width:100%;background:none;border:none;color:var(--text-primary);font-family:'Outfit',sans-serif;font-size:1rem;font-weight:600;padding:1rem 0;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:color 0.3s}
+.faq-question:hover{color:var(--orange)}
+.faq-arrow{font-size:1.1rem;transition:transform 0.3s ease;color:var(--orange)}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.4s ease;color:var(--text-secondary);font-size:0.9rem;line-height:1.7}
+.faq-item.open .faq-answer{max-height:300px;padding-bottom:1rem}
+
+/* CTA */
+#cta{text-align:center;background:linear-gradient(135deg,rgba(249,115,22,0.08) 0%,rgba(167,139,250,0.05) 100%);border-top:1px solid rgba(249,115,22,0.1);border-bottom:1px solid rgba(249,115,22,0.1);position:relative;overflow:hidden}
+#cta::before{content:'';position:absolute;top:50%;left:50%;width:500px;height:500px;background:radial-gradient(circle,rgba(249,115,22,0.08),transparent 70%);transform:translate(-50%,-50%);pointer-events:none}
+.cta-title{font-size:clamp(1.8rem,5vw,3.2rem);font-weight:900;letter-spacing:-1.5px;margin-bottom:0.8rem;position:relative}
+.cta-subtitle{color:var(--text-secondary);font-size:1rem;margin-bottom:2rem;position:relative}
+.cta-note{color:var(--text-dim);font-size:0.85rem;margin-top:1.2rem;position:relative}
+.cta-logo{margin:0 auto 1.5rem;font-weight:900;font-size:2.5rem;letter-spacing:-1px;color:var(--text-primary)}
+.cta-logo span{color:var(--orange)}
+.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative}
+
+/* FOOTER */
+footer{position:relative;z-index:1;padding:2rem;border-top:1px solid var(--bg-card-border)}
+.footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-logo{display:flex;align-items:center;gap:0.5rem}
+.footer-logo-text{font-weight:900;font-size:1rem;color:var(--text-primary)}
+.footer-logo-text span{color:var(--orange)}
+.footer-links{display:flex;gap:1.5rem;list-style:none;flex-wrap:wrap}
+.footer-links a{color:var(--text-secondary);text-decoration:none;font-size:0.85rem;transition:color 0.3s;cursor:pointer}
+.footer-links a:hover{color:var(--orange)}
+.footer-copy{color:var(--text-dim);font-size:0.8rem}
+
+/* FAQ PAGE */
+.faq-page-header{text-align:center;padding-top:5rem;padding-bottom:1rem}
+.faq-page-header h1{font-size:clamp(2rem,4vw,3rem);font-weight:900;letter-spacing:-1px;margin-bottom:0.5rem}
+.faq-page-header p{color:var(--text-secondary);font-size:1rem}
+.faq-nav{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin:1.5rem 0 2rem;padding:0 1rem}
+.faq-nav-btn{padding:0.5rem 1rem;border-radius:8px;border:1px solid var(--bg-card-border);background:var(--bg-card);color:var(--text-secondary);font-family:'Outfit',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;transition:all 0.3s}
+.faq-nav-btn:hover,.faq-nav-btn.active{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,0.08)}
+.faq-section{margin-bottom:2rem}
+.faq-section-title{font-size:1.3rem;font-weight:700;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:2px solid var(--orange);display:inline-block;color:var(--text-primary)}
+.faq-section .faq-item{background:var(--bg-card);border:1px solid var(--bg-card-border);border-radius:10px;margin-bottom:0.6rem;overflow:hidden;transition:border-color 0.3s}
+.faq-section .faq-item:hover{border-color:rgba(249,115,22,0.3)}
+.faq-section .faq-question{padding:1rem 1.2rem;font-size:0.95rem}
+.faq-section .faq-answer{padding:0 1.2rem;font-size:0.88rem}
+.faq-section .faq-item.open .faq-answer{max-height:600px;padding:0 1.2rem 1rem}
+.faq-steps{margin:0.5rem 0;padding:0;list-style:none;counter-reset:step}
+.faq-steps li{counter-increment:step;padding:0.4rem 0 0.4rem 2rem;position:relative;font-size:0.85rem;color:var(--text-secondary)}
+.faq-steps li::before{content:counter(step);position:absolute;left:0;width:22px;height:22px;border-radius:50%;background:rgba(249,115,22,0.15);color:var(--orange);font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;top:0.4rem}
+.faq-code{font-family:'JetBrains Mono',monospace;background:rgba(249,115,22,0.1);color:var(--orange);padding:0.15rem 0.5rem;border-radius:4px;font-size:0.8rem}
+.cmd-table{width:100%;border-collapse:collapse;margin:0.5rem 0}
+.cmd-table th{text-align:left;color:var(--orange);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;padding:0.5rem;border-bottom:1px solid var(--bg-card-border)}
+.cmd-table td{padding:0.5rem;font-size:0.82rem;border-bottom:1px solid rgba(255,255,255,0.03)}
+.cmd-table td:first-child{font-family:'JetBrains Mono',monospace;color:var(--orange);font-size:0.78rem;white-space:nowrap}
+.checklist{margin:0.5rem 0;padding:0;list-style:none}
+.checklist li{display:grid;grid-template-columns:30px 1fr 1fr;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:0.82rem;align-items:start}
+.checklist li .num{color:var(--orange);font-weight:700}
+.checklist li .check{color:var(--text-primary);font-weight:500}
+.checklist li .fix{color:var(--text-secondary)}
+.contact-box{background:var(--bg-card);border:1px solid var(--bg-card-border);border-radius:14px;padding:2rem;text-align:center;margin-top:1.5rem}
+.contact-box h3{font-weight:700;margin-bottom:0.8rem;font-size:1.1rem}
+.contact-links{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1rem}
+.contact-link{padding:0.6rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:0.85rem;transition:all 0.3s}
+.contact-link.email{background:rgba(249,115,22,0.1);color:var(--orange);border:1px solid rgba(249,115,22,0.3)}
+.contact-link.email:hover{background:rgba(249,115,22,0.2)}
+.contact-link.web{background:rgba(167,139,250,0.1);color:var(--purple);border:1px solid rgba(167,139,250,0.3)}
+.contact-link.web:hover{background:rgba(167,139,250,0.2)}
+.bug-info{color:var(--text-dim);font-size:0.8rem;margin-top:1rem;line-height:1.6}
+
+/* SKIP LINK */
+.skip-link{position:absolute;top:-100%;left:0;background:var(--orange);color:var(--bg-primary);padding:0.5rem 1rem;z-index:10000;font-weight:600;border-radius:0 0 8px 0;transition:top 0.2s}
+.skip-link:focus{top:0}
+
+@media(max-width:768px){
+.nav-links{display:none}
+.nav-links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:rgba(10,10,10,0.98);padding:1rem 2rem;gap:0.8rem;border-bottom:1px solid var(--bg-card-border)}
+.mobile-toggle{display:block}
+.clarity-features{grid-template-columns:1fr 1fr}
+.mockups-row{grid-template-columns:1fr}
+.mockups-row .dash-lg{display:none}
+.pricing-grid,.steps-grid{grid-template-columns:1fr}
+.comm-grid{grid-template-columns:1fr}
+.feat-grid{grid-template-columns:1fr;gap:2rem}
+.steps-grid::before{display:none}
+.pricing-card.featured{transform:none}
+.pricing-card.featured:hover{transform:translateY(-3px)}
+.footer-inner{flex-direction:column;text-align:center}
+.footer-links{justify-content:center}
+.footer-logo{justify-content:center}
+.checklist li{grid-template-columns:30px 1fr;gap:0.3rem}
+.checklist li .fix{grid-column:1/-1;padding-left:30px}
+}
+</style>
+</head>
+<body>
+
+<a href="#hero" class="skip-link">Skip to main content</a>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav id="navbar" role="navigation" aria-label="Main navigation"><div class="nav-inner">
+<a class="nav-logo-wrap" data-action="tab" data-tab="home" role="button" tabindex="0" aria-label="VibeCheck home"><div class="nav-logo-text"><span>Vibe</span>Check</div></a>
+<ul class="nav-links" id="navLinks">
+  <li><a data-action="tab" data-tab="home" role="button" tabindex="0">Home</a></li>
+  <li><a data-action="tab-scroll" data-tab="home" data-scroll="#features" role="button" tabindex="0">Features</a></li>
+  <li><a data-action="tab-scroll" data-tab="home" data-scroll="#how-it-works" role="button" tabindex="0">How It Works</a></li>
+  <li><a data-action="tab-scroll" data-tab="home" data-scroll="#pricing" role="button" tabindex="0">Pricing</a></li>
+  <li><a data-action="tab" data-tab="faq" id="faqNavLink" role="button" tabindex="0">FAQ</a></li>
+  <li><a href="https://www.felixagaming.com" target="_blank" rel="noopener" class="nav-social">📺 YouTube · Reddit · Twitch</a></li>
+  <li><a href="https://discord.com/oauth2/authorize?client_id=1465454790174572699&permissions=68608&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="nav-cta">Add to Discord</a></li>
+</ul>
+<button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+</div></nav>
+
+<main>
+
+<!-- HOME TAB -->
+<div id="tab-home" class="page-tab active">
+
+<section id="hero"><div class="container"><div class="hero-grid">
+<div class="logo-large"><div class="logo-text-lg"><span>Vibe</span>Check</div></div>
+<div class="hero-badge">🤖 AI-Powered Community Health</div>
+<h1 class="hero-title">You Can't Fix<br>What You <span class="highlight">Can't See</span></h1>
+<p class="hero-subtitle">Know exactly what's happening in your Discord community — before problems grow.</p>
+<div class="hero-buttons">
+  <a href="https://discord.com/oauth2/authorize?client_id=1465454790174572699&permissions=68608&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="btn btn-primary">🚀 Add to Discord — It's Free</a>
+  <a href="https://www.felixagaming.com" target="_blank" rel="noopener" class="btn btn-social">📺 YouTube · Reddit · Twitch</a>
+</div>
+<p class="hero-trust"><span>✓ Free to start</span><span>·</span><span>✓ Takes 30 seconds</span><span>·</span><span>✓ No credit card required</span></p>
+</div></div></section>
+
+<section id="clarity"><div class="container"><div class="section-title reveal">VibeCheck Gives You Clarity</div><div class="clarity-features"><div class="clarity-item reveal reveal-delay-1"><div><h3>Reveals the real tone</h3><p>Understand the actual mood of conversations</p></div></div><div class="clarity-item reveal reveal-delay-2"><div><h3>Detects harmful behaviors</h3><p>Bullying, insults, profanity, threats — caught automatically</p></div></div><div class="clarity-item reveal reveal-delay-3"><div><h3>Channel breakdown</h3><p>See exactly which channels need your attention</p></div></div><div class="clarity-item reveal reveal-delay-4"><div><h3>Tracks improvement</h3><p>Monitor whether your community is getting better over time</p></div></div></div><div class="mockups-row"><div class="discord-mockup-lg reveal reveal-delay-1"><div class="dm-header"><span class="dm-hash" aria-hidden="true">#</span><span class="dm-channel">general</span></div><div class="dm-body"><div class="dm-msg"><div class="dm-avatar" style="background:#5865F2" aria-hidden="true">M</div><div class="dm-msg-inner"><div class="dm-name" style="color:#7289DA">ModMike</div><div class="dm-text">/vibe</div></div></div><div class="dm-msg"><div class="dm-avatar" style="background:linear-gradient(135deg,var(--orange),var(--purple))" aria-hidden="true">V</div><div class="dm-msg-inner"><div class="dm-name" style="color:var(--orange)">VibeCheck <span class="dm-bot">BOT</span></div><div class="dm-embed"><div class="dm-embed-title">📊 Community Vibe Report</div><div class="dm-field-label">OVERALL VIBE SCORE</div><div class="dm-score">8.1 / 10 <span class="dm-dot-green" aria-label="Healthy">●</span></div><div class="dm-vibe-bar" role="progressbar" aria-valuenow="81" aria-valuemin="0" aria-valuemax="100"><div class="dm-vibe-fill" id="vibeBarFill2"></div></div><div class="dm-fields-row"><div><div class="dm-field-label">MESSAGES ANALYZED</div><div class="dm-field-val">1,247</div></div><div><div class="dm-field-label">FLAGGED</div><div class="dm-field-val"><span style="color:#F59E0B">12</span> ⚠️</div></div></div><div class="dm-fields-row"><div><div class="dm-field-label">TOP CHANNEL</div><div class="dm-field-val">#gaming (9.2)</div></div><div><div class="dm-field-label">NEEDS ATTENTION</div><div class="dm-field-val" style="color:#EF4444">#off-topic (5.4)</div></div></div><div class="dm-footer">🕐 Last 24 hours · Sensitivity: Medium</div></div></div></div><div class="dm-msg"><div class="dm-avatar" style="background:#57F287" aria-hidden="true">S</div><div class="dm-msg-inner"><div class="dm-name" style="color:#57F287">Sarah</div><div class="dm-text">Nice! That #off-topic score is way better than last week 🎉</div></div></div></div></div><div class="dash-lg reveal reveal-delay-2"><div class="dash-lg-topbar"><div class="dash-lg-dots" aria-hidden="true"><span class="ddot" style="background:#EF4444"></span><span class="ddot" style="background:#F59E0B"></span><span class="ddot" style="background:#22C55E"></span></div><div class="dash-lg-title">VibeCheck Dashboard</div><div></div></div><div class="dash-lg-body"><div class="dash-lg-header"><h3>Server Health</h3><div class="dash-lg-badge">↑ Improving</div></div><div class="dash-lg-stats"><div class="dash-lg-stat"><div class="dash-lg-num" style="color:#22C55E">8.1</div><div class="dash-lg-label">Vibe Score</div></div><div class="dash-lg-stat"><div class="dash-lg-num" style="color:var(--orange)">1,247</div><div class="dash-lg-label">Messages</div></div><div class="dash-lg-stat"><div class="dash-lg-num" style="color:#F59E0B">12</div><div class="dash-lg-label">Flagged</div></div></div><div class="dash-lg-ch-label">CHANNEL HEALTH</div><div class="dash-lg-ch"><span class="dash-lg-ch-name">#gaming</span><div class="dash-lg-bar-bg"><div class="dash-lg-bar bar-green" data-width="92%"></div></div><span class="dash-lg-ch-score" style="color:#22C55E">9.2</span></div><div class="dash-lg-ch"><span class="dash-lg-ch-name">#general</span><div class="dash-lg-bar-bg"><div class="dash-lg-bar bar-green" data-width="81%"></div></div><span class="dash-lg-ch-score" style="color:#22C55E">8.1</span></div><div class="dash-lg-ch"><span class="dash-lg-ch-name">#memes</span><div class="dash-lg-bar-bg"><div class="dash-lg-bar bar-yellow" data-width="68%"></div></div><span class="dash-lg-ch-score" style="color:#F59E0B">6.8</span></div><div class="dash-lg-ch"><span class="dash-lg-ch-name">#off-topic</span><div class="dash-lg-bar-bg"><div class="dash-lg-bar bar-red" data-width="54%"></div></div><span class="dash-lg-ch-score" style="color:#EF4444">5.4</span></div></div></div></div></div></section>
+
+<section id="problems"><div class="container"><div class="section-title reveal" style="text-align:center">Running a Community Is Hard</div><div class="section-subtitle reveal" style="text-align:center;margin:0 auto 2.5rem">Thousands of conversations happen daily. You need a better way to keep up.</div><div class="pain-flow"><div class="pain-row reveal"><div class="pain-num" aria-hidden="true"></div><div class="pain-line" aria-hidden="true"></div><div class="pain-content"><h3>Message Overload</h3><p>Thousands of messages fly by every day. You can't read them all — and the important ones get buried in the noise.</p></div></div><div class="pain-row reveal reveal-delay-1"><div class="pain-num" aria-hidden="true"></div><div class="pain-line" aria-hidden="true"></div><div class="pain-content"><h3>Toxicity Spreads Fast</h3><p>One toxic member can poison an entire channel. By the time you notice, the damage is already done and good members have seen it.</p></div></div><div class="pain-row reveal reveal-delay-2"><div class="pain-num" aria-hidden="true"></div><div class="pain-line" aria-hidden="true"></div><div class="pain-content"><h3>Silent Exits</h3><p>Your best members don't complain — they just leave. You'll never get a goodbye message telling you what went wrong.</p></div></div><div class="pain-row reveal reveal-delay-3"><div class="pain-num" aria-hidden="true"></div><div class="pain-line" aria-hidden="true"></div><div class="pain-content"><h3>Mod Burnout</h3><p>Your moderators are exhausted from constantly putting out fires. They're reacting to problems instead of preventing them.</p></div></div><div class="pain-row reveal reveal-delay-4"><div class="pain-num" aria-hidden="true"></div><div class="pain-line" aria-hidden="true"></div><div class="pain-content"><h3>No Data, Just Guessing</h3><p>You have zero proof your community is healthy. No numbers, no trends — just a gut feeling and hope.</p></div></div></div></div></section>
+
+<section id="features"><div class="container"><div class="section-title reveal">Everything You Need</div><div class="section-subtitle reveal">Powerful tools to understand and improve your community.</div><div class="feat-grid"><div class="feat-item reveal"><div class="feat-svg" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Tone Analysis</h3><p>Understand the overall mood of conversations</p></div><div class="feat-item reveal reveal-delay-1"><div class="feat-svg" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h3>Harmful Behavior Detection</h3><p>Catch insults, bullying, profanity, threats</p></div><div class="feat-item reveal"><div class="feat-svg" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg></div><h3>Channel Breakdown</h3><p>See which channels need attention</p></div><div class="feat-item reveal reveal-delay-1"><div class="feat-svg" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="4"/><polyline points="6 10 12 4 18 10"/></svg></div><h3>Progress Tracking</h3><p>Monitor trends over time with <span style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--orange)">/vibe-progress</span></p></div><div class="feat-item reveal"><div class="feat-svg" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="20" y2="12"/><circle cx="12" cy="12" r="3"/></svg></div><h3>Adjustable Sensitivity</h3><p>Gaming mode, General mode, Family/Kids mode</p></div><div class="feat-item reveal reveal-delay-1"><div class="feat-svg" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg></div><h3>Private or Public Reports</h3><p>Choose who sees the results</p></div><div class="feat-item reveal"><div class="feat-svg" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="14" width="3" height="3" rx="0.5"/><rect x="14" y="14" width="3" height="3" rx="0.5"/></svg></div><h3>Custom Timeframes</h3><p>Analyze last hour, day, week, or month</p></div><div class="feat-item reveal reveal-delay-1"><div class="feat-svg" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 6 10-6"/></svg></div><h3>Email Alerts</h3><p>Get notified when reports run</p></div></div></div></section>
+
+<section id="how-it-works"><div class="container"><div class="section-title reveal" style="text-align:center">3 Steps to a Healthier Community</div><div class="steps-grid"><div class="step-card reveal reveal-delay-1"><div class="step-number">1</div><h3>Add VibeCheck to your server</h3><p>Takes 30 seconds with the necessary permissions.</p></div><div class="step-card reveal reveal-delay-2"><div class="step-number">2</div><h3>Run <span class="step-code">/vibe</span> in any channel</h3><p>Initiate a vibe check with a simple slash command.</p></div><div class="step-card reveal reveal-delay-3"><div class="step-number">3</div><h3>Get instant insights</h3><p>Receive clear, actionable reports and track progress.</p></div></div></div></section>
+
+<section id="progress"><div class="container"><div class="section-title reveal">Track Your Community Over Time</div><div class="section-subtitle reveal">See if your community is getting better — with real data.</div><div class="chart-container reveal reveal-delay-2"><svg class="chart-svg" viewBox="0 0 600 250" role="img" aria-label="Line chart showing vibe score improvement from 4.6 in week 1 to 7.6 in week 4"><defs><linearGradient id="orangeGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(249,115,22,0.3)"/><stop offset="100%" stop-color="rgba(249,115,22,0)"/></linearGradient></defs><line x1="60" y1="30" x2="560" y2="30" stroke="#2A2A2A"/><line x1="60" y1="90" x2="560" y2="90" stroke="#2A2A2A"/><line x1="60" y1="150" x2="560" y2="150" stroke="#2A2A2A"/><line x1="60" y1="210" x2="560" y2="210" stroke="#2A2A2A"/><text x="30" y="35" fill="#8A8A8A" font-size="12" font-family="Outfit">9</text><text x="30" y="95" fill="#8A8A8A" font-size="12" font-family="Outfit">7</text><text x="30" y="155" fill="#8A8A8A" font-size="12" font-family="Outfit">5</text><text x="30" y="215" fill="#8A8A8A" font-size="12" font-family="Outfit">3</text><text x="120" y="240" fill="#8A8A8A" font-size="12" font-family="Outfit" text-anchor="middle">Week 1</text><text x="270" y="240" fill="#8A8A8A" font-size="12" font-family="Outfit" text-anchor="middle">Week 2</text><text x="410" y="240" fill="#8A8A8A" font-size="12" font-family="Outfit" text-anchor="middle">Week 3</text><text x="540" y="240" fill="#8A8A8A" font-size="12" font-family="Outfit" text-anchor="middle">Week 4</text><polygon class="chart-fill" id="chartFill" points="120,168 270,132 410,114 540,96 540,210 120,210"/><polyline class="chart-line" id="chartLine" points="120,168 270,132 410,114 540,96"/><circle class="chart-dot" id="dot1" cx="120" cy="168"/><circle class="chart-dot" id="dot2" cx="270" cy="132"/><circle class="chart-dot" id="dot3" cx="410" cy="114"/><circle class="chart-dot" id="dot4" cx="540" cy="96"/></svg><div style="text-align:center;color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem">This server improved their vibe score by 30% in one month</div><div class="stats-row"><div class="stat-item"><div class="stat-value green">+30%</div><div class="stat-label">Healthier conversations</div></div><div class="stat-item"><div class="stat-value red">-45%</div><div class="stat-label">Flagged messages</div></div><div class="stat-item"><div class="stat-value blue">+20%</div><div class="stat-label">Friendly interactions</div></div></div></div></div></section>
+
+<section id="communities"><div class="container"><div class="section-title reveal">Built for Every Community</div><div class="comm-grid"><div class="comm-box reveal reveal-delay-1"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2z"/><path d="M14 7h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="8" cy="6" r="2"/></svg></div><h3>🎮 Gaming Servers</h3><p>Keep competitive chat fun, not toxic</p></div><div class="comm-box reveal reveal-delay-2"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>👨‍👩‍👧 Family &amp; Kids</h3><p>Protect young members from harmful content</p></div><div class="comm-box reveal reveal-delay-3"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></div><h3>💼 Professional Communities</h3><p>Maintain brand reputation</p></div><div class="comm-box reveal reveal-delay-1"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><h3>🎓 Education &amp; Study Groups</h3><p>Create safe learning spaces</p></div><div class="comm-box reveal reveal-delay-2"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3-3 3 3"/></svg></div><h3>🎨 Creator Communities</h3><p>Keep your fanbase positive</p></div><div class="comm-box reveal reveal-delay-3"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div><h3>🤝 Support Communities</h3><p>Ensure members feel heard and safe</p></div></div><div class="reveal reveal-delay-3" style="margin-top:1.5rem"><a href="https://discord.com/oauth2/authorize?client_id=1465454790174572699&permissions=68608&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="btn btn-primary">Add to Your Server</a></div></div></section>
+
+<section id="pricing"><div class="container"><div class="section-title reveal" style="text-align:center">Simple Pricing</div><div class="section-subtitle reveal" style="text-align:center;margin:0 auto">Start free. Upgrade when you need more.</div><div class="pricing-grid"><div class="pricing-card reveal reveal-delay-1"><div class="pricing-name">Free Plan</div><div class="pricing-price">$0</div><div class="pricing-period">Forever free</div><ul class="pricing-features"><li>5 reports total</li><li>Up to 500 messages per scan</li><li>7-day max timeframe</li><li>Basic insights</li></ul><a href="https://discord.com/oauth2/authorize?client_id=1465454790174572699&permissions=68608&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="btn btn-secondary">Add to Discord Free</a></div><div class="pricing-card featured reveal reveal-delay-2"><div class="pricing-badge">Best Value</div><div class="pricing-name">Pro Yearly</div><div class="pricing-price">$99<span style="font-size:1rem;font-weight:400;color:var(--text-dim)">/year</span></div><div class="pricing-period">$8.25/mo — 1 month FREE</div><ul class="pricing-features"><li>Everything in Pro</li><li>1 month FREE</li><li>Best value for serious communities</li></ul><a href="https://buy.stripe.com/YOUR_YEARLY_PLAN_LINK_HERE" target="_blank" rel="noopener" class="btn btn-primary">Go Pro Yearly</a></div><div class="pricing-card reveal reveal-delay-3"><div class="pricing-name">Pro Monthly</div><div class="pricing-price">$8.99<span style="font-size:1rem;font-weight:400;color:var(--text-dim)">/mo</span></div><div class="pricing-period">Cancel anytime</div><ul class="pricing-features"><li>30 reports per month</li><li>Up to 1000 messages per scan</li><li>30-day timeframe</li><li>Custom date ranges</li><li>Priority support</li></ul><a href="https://buy.stripe.com/test_3cI5kF3rtb9U6NFghe4Ni02" target="_blank" rel="noopener" class="btn btn-secondary">Go Pro</a></div></div></div></section>
+
+<section id="quick-faq"><div class="container"><div class="section-title reveal" style="text-align:center">Common Questions</div><div class="faq-list" id="landingFaqList"><div class="faq-item reveal"><button class="faq-question" aria-expanded="false">How does VibeCheck analyze messages?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">We use AI to understand tone and detect harmful patterns — no messages are stored.</div></div><div class="faq-item reveal reveal-delay-1"><button class="faq-question" aria-expanded="false">Is my community's data safe?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Yes. We don't store message content. Only anonymized insights are saved.</div></div><div class="faq-item reveal reveal-delay-2"><button class="faq-question" aria-expanded="false">What permissions does the bot need?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Just three: View Channels, Read Message History, and Send Messages. The invite link includes all three automatically.</div></div><div class="faq-item reveal reveal-delay-3"><button class="faq-question" aria-expanded="false">Can I customize sensitivity?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Yes — choose Low (gaming), Medium (general), or High (kids/family) to match your community.</div></div></div><div style="text-align:center;margin-top:1.5rem" class="reveal reveal-delay-4"><a data-action="tab" data-tab="faq" class="btn btn-secondary" role="button" tabindex="0">📖 Full Troubleshooting &amp; FAQ Guide →</a></div></div></section>
+
+<section id="cta"><div class="container" style="text-align:center"><div class="cta-logo reveal"><span>Vibe</span>Check</div><div class="cta-title reveal reveal-delay-1">Ready to See What's<br>Really Happening?</div><p class="cta-subtitle reveal reveal-delay-2">Join hundreds of community managers who stopped guessing and started knowing.</p><div class="cta-buttons reveal reveal-delay-3"><a href="https://discord.com/oauth2/authorize?client_id=1465454790174572699&permissions=68608&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="btn btn-primary" style="font-size:1rem;padding:0.9rem 2rem">🚀 Add VibeCheck — Free</a><a href="https://www.felixagaming.com" target="_blank" rel="noopener" class="btn btn-social">📺 YouTube · Reddit · Twitch</a></div><p class="cta-note reveal reveal-delay-4">Takes 30 seconds. No credit card required.</p></div></section>
+
+</div>
+
+<!-- FAQ TAB -->
+<div id="tab-faq" class="page-tab">
+
+<section class="faq-page-header"><div class="container">
+<h1 class="reveal">Troubleshooting &amp; <span style="color:var(--orange)">FAQ</span></h1>
+<p class="reveal reveal-delay-1">Everything you need to fix common issues with VibeCheck Bot</p>
+<div class="faq-nav reveal reveal-delay-2" role="tablist" aria-label="FAQ categories">
+  <button class="faq-nav-btn active" data-faq-cat="all" role="tab" aria-selected="true">All</button>
+  <button class="faq-nav-btn" data-faq-cat="setup" role="tab" aria-selected="false">Setup &amp; Permissions</button>
+  <button class="faq-nav-btn" data-faq-cat="reports" role="tab" aria-selected="false">Running Reports</button>
+  <button class="faq-nav-btn" data-faq-cat="scoring" role="tab" aria-selected="false">Reports &amp; Scoring</button>
+  <button class="faq-nav-btn" data-faq-cat="pro" role="tab" aria-selected="false">Free Trial &amp; Pro</button>
+  <button class="faq-nav-btn" data-faq-cat="hosting" role="tab" aria-selected="false">Hosting &amp; Deployment</button>
+  <button class="faq-nav-btn" data-faq-cat="commands" role="tab" aria-selected="false">Commands</button>
+</div>
+</div></section>
+
+<section style="padding-top:0"><div class="container" style="max-width:800px" id="faqPageContent">
+
+<div class="faq-section" data-cat="setup">
+<div class="faq-section-title">🔧 Setup &amp; Permissions</div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">"I don't have permission to read that channel"<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">The bot doesn't have access to that channel. Channels can override server-wide permissions.<ol class="faq-steps"><li>Go to the channel → click gear icon (Edit Channel) → Permissions</li><li>Click "Add Role" → find "VibeCheck"</li><li>Enable ✅ View Channel, ✅ Read Message History, ✅ Send Messages</li><li>Save changes and try <span class="faq-code">/vibe</span> again</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">The bot is in my server but /vibe doesn't show up<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">The slash command may not be registered or Discord's integration settings are blocking it.<ol class="faq-steps"><li>Go to Server Settings → Integrations → VibeCheck → Manage</li><li>Make sure /vibe is enabled for All Channels and All Members</li><li>If still missing, kick the bot and re-add with the <a href="https://discord.com/oauth2/authorize?client_id=1465454790174572699&permissions=68608&integration_type=0&scope=bot+applications.commands" target="_blank" style="color:var(--orange)">invite link</a></li><li>Wait 1–2 minutes for Discord to sync slash commands</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">I re-invited the bot but it still can't read my channel<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">The channel likely has permission overrides for @everyone that block Read Message History.<ol class="faq-steps"><li>Go to Server Settings → Roles → drag VibeCheck role ABOVE other roles</li><li>Go to the channel → Edit Channel → Permissions</li><li>If @everyone has ❌ on Read Message History, add VibeCheck with explicit ✅</li><li>Save and try <span class="faq-code">/vibe</span> again</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">What permissions does the bot need?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">VibeCheck requires three permissions: <strong>View Channels</strong>, <strong>Read Message History</strong>, and <strong>Send Messages</strong>. The invite link (permission code 68608) includes all three.</div></div>
+</div>
+
+<div class="faq-section" data-cat="reports">
+<div class="faq-section-title">📋 Running Reports</div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">"Not enough messages to analyze. Need at least 10."<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">The channel needs at least 10 human messages. Bot messages, system messages, and commands don't count.<ol class="faq-steps"><li>Post at least 10 real messages in the channel</li><li>Bot/system messages are filtered out automatically</li><li>Try <span class="faq-code">/vibe</span> again after posting enough messages</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">"No analyzable messages found" or wrong timeframe<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">The default timeframe is 1 hour. If nobody chatted recently, there's nothing to analyze.<ol class="faq-steps"><li>Use a longer timeframe: <span class="faq-code">/vibe timeframe:7d</span></li><li>Available: 1h (default), 24h, 7d, 30d</li><li>Pro users can use Custom with specific dates</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">"Something went wrong. Please try again."<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Usually means the AI analysis failed — API quota or unexpected response.<ol class="faq-steps"><li>Wait 30–60 seconds and try again</li><li>If it says "quota exceeded" your API key may need refreshing</li><li>Contact <a href="mailto:go@vibecheckbot.com" style="color:var(--orange)">go@vibecheckbot.com</a> if it persists</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">Can anyone run /vibe or just admins?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">By default everyone can run /vibe. Restrict it in Server Settings → Integrations → VibeCheck → Manage. You can limit by role, channel, or specific commands.</div></div>
+</div>
+
+<div class="faq-section" data-cat="scoring">
+<div class="faq-section-title">📊 Reports &amp; Scoring</div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">What do the sensitivity levels mean?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer"><ol class="faq-steps"><li><strong>Low 🎮</strong> — Gaming servers. Trash talk tolerated. Only flags serious threats and slurs.</li><li><strong>Medium ⚖️</strong> — General communities. Flags insults, harassment, repeated negativity.</li><li><strong>High 👶</strong> — Kids/family/education. Very strict. Flags mild negativity and any profanity.</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">What do the scores mean?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer"><ol class="faq-steps"><li><strong>9–10 🟢</strong> Excellent — Very friendly, supportive community</li><li><strong>7–8 🟢</strong> Good — Mostly positive with minor issues</li><li><strong>5–6 🟡</strong> Needs Work — Mixed vibes, some problems</li><li><strong>3–4 🟠</strong> Poor — Significant negativity</li><li><strong>0–2 🔴</strong> Toxic — Serious issues, immediate action needed</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">What are the visibility options?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer"><strong>Private</strong> (default) — Only you see the report. <strong>Public</strong> — Posted in channel for everyone.</div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">The bot is detecting things incorrectly<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Adjust sensitivity to match your community. If flagging normal gaming banter → use Low. If missing toxicity → use High. Works best in English and Spanish.</div></div>
+</div>
+
+<div class="faq-section" data-cat="pro">
+<div class="faq-section-title">⚡ Free Trial &amp; Pro</div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">"Free Trial Ended" — How many free reports?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Each server gets <strong>5 free reports</strong>. After that, upgrade to Pro.<ol class="faq-steps"><li><strong>Free:</strong> 5 reports total, 500 messages/scan, 7-day max</li><li><strong>Pro ($8.99/mo):</strong> 30 reports/month, 1000 messages/scan, 30-day, custom dates</li><li>Trial count is per server, not per user</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">How do I upgrade to Pro?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer"><ol class="faq-steps"><li>Click the "Get VibeCheck Pro" button in any VibeCheck message, OR</li><li>Go to: <a href="https://buy.stripe.com/test_3cI5kF3rtb9U6NFghe4Ni02" target="_blank" style="color:var(--orange)">Stripe payment page</a></li><li>Complete payment ($8.99/month)</li><li>Send your Server ID to <a href="mailto:go@vibecheckbot.com" style="color:var(--orange)">go@vibecheckbot.com</a></li><li>Activated within 24 hours</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">I paid but my server isn't showing as Pro<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Pro activation is currently manual. Email <a href="mailto:go@vibecheckbot.com" style="color:var(--orange)">go@vibecheckbot.com</a> with your payment confirmation and Server ID. Allow up to 24 hours. You'll know it's active when the footer shows "⚡ Pro" instead of "🎁 Free".</div></div>
+</div>
+
+<div class="faq-section" data-cat="hosting">
+<div class="faq-section-title">🖥️ Hosting &amp; Deployment</div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">The bot keeps crashing on Railway<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer"><ol class="faq-steps"><li>Check Variables tab: DISCORD_TOKEN, CLIENT_ID, OPENAI_API_KEY, RESEND_API_KEY, SUPABASE_URL, SUPABASE_KEY</li><li>Railway free tier may need a payment method in Billing</li><li>If "Stopping Container" — check logs for error before that message</li></ol></div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">"Quota exceeded" / API rate limit errors<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">The bot uses OpenAI (GPT-4o-mini). If you see quota errors, check billing at platform.openai.com. Make sure the API key is valid and has credits. Wait 60 seconds and retry.</div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">Bot is online but nothing happens with /vibe<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">If Railway shows it's running but no logs appear when you use /vibe — Discord itself is blocking the command. Go to Server Settings → Integrations → VibeCheck → enable commands. Try kicking and re-adding the bot.</div></div>
+<div class="faq-item"><button class="faq-question" aria-expanded="false">Email reports aren't arriving<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Check: RESEND_API_KEY in Railway Variables, your spam folder, domain verification in Resend dashboard, and Railway logs for "Report email error" messages.</div></div>
+</div>
+
+<div class="faq-section" data-cat="commands">
+<div class="faq-section-title">⌨️ Commands Reference</div>
+<div style="background:var(--bg-card);border:1px solid var(--bg-card-border);border-radius:12px;padding:1.2rem;overflow-x:auto">
+<table class="cmd-table"><thead><tr><th scope="col">Command</th><th scope="col">Description</th></tr></thead><tbody>
+<tr><td>/vibe</td><td>Run a friendliness analysis on the current channel</td></tr>
+<tr><td>/vibe timeframe:7d</td><td>Analyze last 7 days (1h, 24h, 7d, 30d, Custom)</td></tr>
+<tr><td>/vibe sensitivity:Low</td><td>Gaming-friendly analysis (Low, Medium, High)</td></tr>
+<tr><td>/vibe visibility:Public</td><td>Share the report with everyone in the channel</td></tr>
+<tr><td>/vibe messages:100</td><td>Analyze last 100 messages (20, 50, 100, 250, 500)</td></tr>
+<tr><td>/vibe-progress</td><td>See friendliness trend over time with a graph</td></tr>
+<tr><td>/vibe-admin</td><td>Admin settings and configuration</td></tr>
+</tbody></table></div>
+
+<div style="margin-top:2rem"><div class="faq-section-title">✅ Quick Fix Checklist</div>
+<div style="background:var(--bg-card);border:1px solid var(--bg-card-border);border-radius:12px;padding:1.2rem;overflow-x:auto">
+<ul class="checklist">
+<li><span class="num">1</span><span class="check">Is the bot online?</span><span class="fix">Check Railway → green status?</span></li>
+<li><span class="num">2</span><span class="check">Can you see /vibe?</span><span class="fix">Server Settings → Integrations → enable commands</span></li>
+<li><span class="num">3</span><span class="check">Does bot respond?</span><span class="fix">Check Railway logs when running command</span></li>
+<li><span class="num">4</span><span class="check">Permission error?</span><span class="fix">Edit Channel → Permissions → Add VibeCheck role</span></li>
+<li><span class="num">5</span><span class="check">Not enough messages?</span><span class="fix">Post 10+ messages or use /vibe timeframe:7d</span></li>
+<li><span class="num">6</span><span class="check">Wrong timeframe?</span><span class="fix">Use timeframe:7d or 30d</span></li>
+<li><span class="num">7</span><span class="check">"Something went wrong"?</span><span class="fix">Check Railway logs (usually API related)</span></li>
+<li><span class="num">8</span><span class="check">API quota error?</span><span class="fix">Check OpenAI billing</span></li>
+<li><span class="num">9</span><span class="check">Bot crashes?</span><span class="fix">Check all env variables in Railway</span></li>
+<li><span class="num">10</span><span class="check">Still broken?</span><span class="fix">Kick → re-invite → wait 2 min → try again</span></li>
+</ul></div></div>
+</div>
+
+<div class="contact-box">
+<h3>Still Need Help?</h3>
+<p style="color:var(--text-secondary);font-size:0.9rem">If you've gone through this guide and still have issues:</p>
+<div class="contact-links">
+  <a href="mailto:go@vibecheckbot.com" class="contact-link email">📧 go@vibecheckbot.com</a>
+  <a href="https://www.felixagaming.com/vibe" target="_blank" rel="noopener" class="contact-link web">🌐 felixagaming.com/vibe</a>
+  <a href="https://www.felixagaming.com" target="_blank" rel="noopener" class="contact-link web">📺 YouTube · Reddit · Twitch</a>
+</div>
+<p class="bug-info">When reporting a bug, include: what you were trying to do, the exact error message, a screenshot if possible, and your Server ID (right-click server → Copy Server ID).</p>
+</div>
+
+</div></section>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer><div class="footer-inner">
+<div class="footer-logo" data-action="tab" data-tab="home" style="cursor:pointer" role="button" tabindex="0" aria-label="Go to home page"><div class="footer-logo-text"><span>Vibe</span>Check</div></div>
+<ul class="footer-links">
+  <li><a data-action="tab" data-tab="home" role="button" tabindex="0">Home</a></li>
+  <li><a data-action="tab-scroll" data-tab="home" data-scroll="#features" role="button" tabindex="0">Features</a></li>
+  <li><a data-action="tab-scroll" data-tab="home" data-scroll="#pricing" role="button" tabindex="0">Pricing</a></li>
+  <li><a data-action="tab" data-tab="faq" role="button" tabindex="0">FAQ</a></li>
+  <li><a href="https://www.felixagaming.com" target="_blank" rel="noopener">FelixaGaming</a></li>
+  <li><a href="mailto:go@vibecheckbot.com">Contact</a></li>
+</ul>
+<div class="footer-copy">© <span id="copyrightYear"></span> VibeCheck. All rights reserved.</div>
+</div></footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* === COPYRIGHT YEAR === */
+  var startYear = 2025;
+  var currentYear = new Date().getFullYear();
+  var yearEl = document.getElementById('copyrightYear');
+  if(yearEl) yearEl.textContent = currentYear > startYear ? startYear + '–' + currentYear : String(startYear);
+
+  /* === TAB STATE === */
+  var currentTab = 'home';
+
+  function showTab(tab){
+    var isAlreadyActive = (tab === currentTab);
+    document.querySelectorAll('.page-tab').forEach(function(t){ t.classList.remove('active'); });
+    var target = document.getElementById('tab-' + tab);
+    if(target) target.classList.add('active');
+    currentTab = tab;
+    if(!isAlreadyActive) window.scrollTo({top: 0, behavior: 'smooth'});
+    document.getElementById('navLinks').classList.remove('open');
+    updateMobileToggle(false);
+    var faqLink = document.getElementById('faqNavLink');
+    if(faqLink) faqLink.classList.toggle('active-tab', tab === 'faq');
+    setTimeout(function(){
+      document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){ observer.observe(el); });
+    }, 100);
+  }
+
+  function scrollToSection(sel){
+    setTimeout(function(){
+      var el = document.querySelector(sel);
+      if(el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }, 150);
+  }
+
+  /* === EVENT DELEGATION — all interactive actions === */
+  document.addEventListener('click', function(e){
+    // Navigation actions
+    var actionEl = e.target.closest('[data-action]');
+    if(actionEl){
+      var action = actionEl.getAttribute('data-action');
+      var tab = actionEl.getAttribute('data-tab');
+      var scroll = actionEl.getAttribute('data-scroll');
+      e.preventDefault();
+      if(action === 'tab') showTab(tab);
+      else if(action === 'tab-scroll'){ showTab(tab); if(scroll) scrollToSection(scroll); }
+      return;
+    }
+    // FAQ accordion
+    var faqBtn = e.target.closest('.faq-question');
+    if(faqBtn){
+      var item = faqBtn.parentElement;
+      var wasOpen = item.classList.contains('open');
+      var section = item.closest('.faq-list') || item.closest('.faq-section');
+      if(section){
+        section.querySelectorAll('.faq-item').forEach(function(i){
+          i.classList.remove('open');
+          var q = i.querySelector('.faq-question');
+          if(q) q.setAttribute('aria-expanded', 'false');
+        });
+      }
+      if(!wasOpen){ item.classList.add('open'); faqBtn.setAttribute('aria-expanded', 'true'); }
+      return;
+    }
+    // FAQ category filter
+    var catBtn = e.target.closest('.faq-nav-btn');
+    if(catBtn){
+      var cat = catBtn.getAttribute('data-faq-cat');
+      if(!cat) return;
+      document.querySelectorAll('.faq-nav-btn').forEach(function(b){
+        b.classList.remove('active'); b.setAttribute('aria-selected', 'false');
+      });
+      catBtn.classList.add('active'); catBtn.setAttribute('aria-selected', 'true');
+      document.querySelectorAll('#faqPageContent .faq-section').forEach(function(s){
+        s.style.display = (cat === 'all' || s.getAttribute('data-cat') === cat) ? '' : 'none';
+      });
+    }
+  });
+
+  /* === KEYBOARD SUPPORT === */
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    var el = e.target.closest('[data-action], [data-faq-cat]');
+    if(el){ e.preventDefault(); el.click(); }
+  });
+
+  /* === MOBILE MENU === */
+  var mobileToggle = document.getElementById('mobileToggle');
+  function updateMobileToggle(isOpen){
+    if(mobileToggle) mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+  if(mobileToggle){
+    mobileToggle.addEventListener('click', function(){
+      var nav = document.getElementById('navLinks');
+      if(nav){ var isOpen = nav.classList.toggle('open'); updateMobileToggle(isOpen); }
+    });
+  }
+
+  /* === SCROLL REVEALS === */
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        if(entry.target.closest('#progress')) animateChart();
+        if(entry.target.closest('#clarity')) animateDashboard();
+      }
+    });
+  }, {threshold: 0.1});
+  document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+
+  /* === NAV SCROLL === */
+  var navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', function(){
+    if(navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  /* === CHART ANIMATION === */
+  var chartAnimated = false;
+  function animateChart(){
+    if(chartAnimated) return;
+    chartAnimated = true;
+    var line = document.getElementById('chartLine');
+    var fill = document.getElementById('chartFill');
+    if(line) line.classList.add('animated');
+    if(fill) fill.classList.add('animated');
+    ['dot1','dot2','dot3','dot4'].forEach(function(id){
+      var dot = document.getElementById(id);
+      if(dot) dot.classList.add('animated');
+    });
+  }
+
+  /* === DASHBOARD ANIMATION === */
+  var dashAnimated = false;
+  function animateDashboard(){
+    if(dashAnimated) return;
+    dashAnimated = true;
+    document.querySelectorAll('.dash-lg-bar').forEach(function(bar){
+      var w = bar.getAttribute('data-width');
+      if(w) bar.style.width = w;
+    });
+    var vb = document.getElementById('vibeBarFill2');
+    if(vb) vb.style.width = '81%';
+  }
+
+})();
+</script>
+</body>
+</html>
