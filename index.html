@@ -300,6 +300,16 @@ footer{position:relative;z-index:1;padding:2rem;border-top:1px solid var(--bg-ca
 .skip-link{position:absolute;top:-100%;left:0;background:var(--orange);color:var(--bg-primary);padding:0.5rem 1rem;z-index:10000;font-weight:600;border-radius:0 0 8px 0;transition:top 0.2s}
 .skip-link:focus{top:0}
 
+/* DEMO VIDEO */
+.demo-video-outer{width:100%;max-width:780px;margin:1.5rem auto 0}
+.demo-video-border{border-radius:14px;padding:2px;background:linear-gradient(135deg,#F97316,#A78BFA,#F97316)}
+.demo-video-inner{border-radius:12px;overflow:hidden;background:#1C1C1C}
+.demo-video-topbar{background:#252525;padding:0.5rem 0.8rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid rgba(255,255,255,0.06)}
+.demo-video-topbar-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.demo-video-topbar-title{font-size:0.72rem;color:#555;margin-left:auto;margin-right:auto}
+.demo-video-wrap{aspect-ratio:16/9}
+.demo-video-wrap iframe{width:100%;height:100%;display:block;border:none}
+
 @media(max-width:768px){
 .nav-links{display:none}
 .nav-links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:rgba(10,10,10,0.98);padding:1rem 2rem;gap:0.8rem;border-bottom:1px solid var(--bg-card-border)}
@@ -357,6 +367,23 @@ footer{position:relative;z-index:1;padding:2rem;border-top:1px solid var(--bg-ca
   <a href="https://www.felixagaming.com" target="_blank" rel="noopener" class="btn btn-social">📺 YouTube · Reddit · Twitch</a>
 </div>
 <p class="hero-trust"><span>✓ Free to start</span><span>·</span><span>✓ Takes 30 seconds</span><span>·</span><span>✓ No credit card required</span></p>
+
+<div class="demo-video-outer">
+  <div class="demo-video-border">
+    <div class="demo-video-inner">
+      <div class="demo-video-topbar">
+        <span class="demo-video-topbar-dot" style="background:#EF4444"></span>
+        <span class="demo-video-topbar-dot" style="background:#F59E0B"></span>
+        <span class="demo-video-topbar-dot" style="background:#22C55E"></span>
+        <span class="demo-video-topbar-title">VibeCheck Demo</span>
+      </div>
+      <div class="demo-video-wrap">
+        <iframe src="https://www.youtube.com/embed/RnF5AOTR_7o" title="VibeCheck Bot Demo" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div></div></section>
 
 <section id="clarity"><div class="container"><div class="section-title reveal">VibeCheck Gives You Clarity</div><div class="clarity-features"><div class="clarity-item reveal reveal-delay-1"><div><h3>Reveals the real tone</h3><p>Understand the actual mood of conversations</p></div></div><div class="clarity-item reveal reveal-delay-2"><div><h3>Detects harmful behaviors</h3><p>Bullying, insults, profanity, threats — caught automatically</p></div></div><div class="clarity-item reveal reveal-delay-3"><div><h3>Channel breakdown</h3><p>See exactly which channels need your attention</p></div></div><div class="clarity-item reveal reveal-delay-4"><div><h3>Tracks improvement</h3><p>Monitor whether your community is getting better over time</p></div></div></div><div class="mockups-row"><div class="discord-mockup-lg reveal reveal-delay-1"><div class="dm-header"><span class="dm-hash" aria-hidden="true">#</span><span class="dm-channel">general</span></div><div class="dm-body"><div class="dm-msg"><div class="dm-avatar" style="background:#5865F2" aria-hidden="true">M</div><div class="dm-msg-inner"><div class="dm-name" style="color:#7289DA">ModMike</div><div class="dm-text">/vibe</div></div></div><div class="dm-msg"><div class="dm-avatar" style="background:linear-gradient(135deg,var(--orange),var(--purple))" aria-hidden="true">V</div><div class="dm-msg-inner"><div class="dm-name" style="color:var(--orange)">VibeCheck <span class="dm-bot">BOT</span></div><div class="dm-embed"><div class="dm-embed-title">📊 Community Vibe Report</div><div class="dm-field-label">OVERALL VIBE SCORE</div><div class="dm-score">8.1 / 10 <span class="dm-dot-green" aria-label="Healthy">●</span></div><div class="dm-vibe-bar" role="progressbar" aria-valuenow="81" aria-valuemin="0" aria-valuemax="100"><div class="dm-vibe-fill" id="vibeBarFill2"></div></div><div class="dm-fields-row"><div><div class="dm-field-label">MESSAGES ANALYZED</div><div class="dm-field-val">1,247</div></div><div><div class="dm-field-label">FLAGGED</div><div class="dm-field-val"><span style="color:#F59E0B">12</span> ⚠️</div></div></div><div class="dm-fields-row"><div><div class="dm-field-label">TOP CHANNEL</div><div class="dm-field-val">#gaming (9.2)</div></div><div><div class="dm-field-label">NEEDS ATTENTION</div><div class="dm-field-val" style="color:#EF4444">#off-topic (5.4)</div></div></div><div class="dm-footer">🕐 Last 24 hours · Sensitivity: Medium</div></div></div></div><div class="dm-msg"><div class="dm-avatar" style="background:#57F287" aria-hidden="true">S</div><div class="dm-msg-inner"><div class="dm-name" style="color:#57F287">Sarah</div><div class="dm-text">Nice! That #off-topic score is way better than last week 🎉</div></div></div></div></div><div class="dash-lg reveal reveal-delay-2"><div class="dash-lg-topbar"><div class="dash-lg-dots" aria-hidden="true"><span class="ddot" style="background:#EF4444"></span><span class="ddot" style="background:#F59E0B"></span><span class="ddot" style="background:#22C55E"></span></div><div class="dash-lg-title">VibeCheck Dashboard</div><div></div></div><div class="dash-lg-body"><div class="dash-lg-header"><h3>Server Health</h3><div class="dash-lg-badge">↑ Improving</div></div><div class="dash-lg-stats"><div class="dash-lg-stat"><div class="dash-lg-num" style="color:#22C55E">8.1</div><div class="dash-lg-label">Vibe Score</div></div><div class="dash-lg-stat"><div class="dash-lg-num" style="color:var(--orange)">1,247</div><div class="dash-lg-label">Messages</div></div><div class="dash-lg-stat"><div class="dash-lg-num" style="color:#F59E0B">12</div><div class="dash-lg-label">Flagged</div></div></div><div class="dash-lg-ch-label">CHANNEL HEALTH</div><div class="dash-lg-ch"><span class="dash-lg-ch-name">#gaming</span><div class="dash-lg-bar-bg"><div class="dash-lg-bar bar-green" data-width="92%"></div></div><span class="dash-lg-ch-score" style="color:#22C55E">9.2</span></div><div class="dash-lg-ch"><span class="dash-lg-ch-name">#general</span><div class="dash-lg-bar-bg"><div class="dash-lg-bar bar-green" data-width="81%"></div></div><span class="dash-lg-ch-score" style="color:#22C55E">8.1</span></div><div class="dash-lg-ch"><span class="dash-lg-ch-name">#memes</span><div class="dash-lg-bar-bg"><div class="dash-lg-bar bar-yellow" data-width="68%"></div></div><span class="dash-lg-ch-score" style="color:#F59E0B">6.8</span></div><div class="dash-lg-ch"><span class="dash-lg-ch-name">#off-topic</span><div class="dash-lg-bar-bg"><div class="dash-lg-bar bar-red" data-width="54%"></div></div><span class="dash-lg-ch-score" style="color:#EF4444">5.4</span></div></div></div></div></div></section>
