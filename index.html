@@ -213,20 +213,6 @@ section{position:relative;z-index:1;padding:3rem 2rem}
 .comm-box h3{font-weight:700;font-size:0.95rem;margin-bottom:0.3rem}
 .comm-box p{color:var(--text-secondary);font-size:0.85rem}
 
-/* PRICING */
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:2rem;align-items:start}
-.pricing-card{padding:2rem 1.5rem;background:var(--bg-card);border:1px solid var(--bg-card-border);border-radius:16px;transition:all 0.4s ease;position:relative}
-.pricing-card:hover{transform:translateY(-3px)}
-.pricing-card.featured{border-color:var(--orange);background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(249,115,22,0.02));transform:scale(1.04)}
-.pricing-card.featured:hover{transform:scale(1.04) translateY(-3px)}
-.pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--orange);color:var(--bg-primary);padding:0.25rem 0.9rem;border-radius:50px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
-.pricing-name{font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:0.4rem}
-.pricing-price{font-size:2.2rem;font-weight:900;margin-bottom:0.2rem}
-.pricing-period{color:var(--text-dim);font-size:0.8rem;margin-bottom:1.2rem}
-.pricing-features{list-style:none;margin-bottom:1.5rem}
-.pricing-features li{padding:0.4rem 0;color:var(--text-secondary);font-size:0.85rem;display:flex;align-items:center;gap:0.5rem}
-.pricing-features li::before{content:'✓';color:var(--orange);font-weight:700}
-.pricing-card .btn{width:100%;justify-content:center;font-size:0.9rem;padding:0.7rem 1.5rem}
 
 /* LANDING FAQ */
 .faq-list{max-width:700px;margin:2rem auto 0}
@@ -317,12 +303,10 @@ footer{position:relative;z-index:1;padding:2rem;border-top:1px solid var(--bg-ca
 .clarity-features{grid-template-columns:1fr 1fr}
 .mockups-row{grid-template-columns:1fr}
 .mockups-row .dash-lg{display:none}
-.pricing-grid,.steps-grid{grid-template-columns:1fr}
+.steps-grid{grid-template-columns:1fr}
 .comm-grid{grid-template-columns:1fr}
 .feat-grid{grid-template-columns:1fr;gap:2rem}
 .steps-grid::before{display:none}
-.pricing-card.featured{transform:none}
-.pricing-card.featured:hover{transform:translateY(-3px)}
 .footer-inner{flex-direction:column;text-align:center}
 .footer-links{justify-content:center}
 .footer-logo{justify-content:center}
@@ -343,7 +327,6 @@ footer{position:relative;z-index:1;padding:2rem;border-top:1px solid var(--bg-ca
   <li><a data-action="tab" data-tab="home" role="button" tabindex="0">Home</a></li>
   <li><a data-action="tab-scroll" data-tab="home" data-scroll="#features" role="button" tabindex="0">Features</a></li>
   <li><a data-action="tab-scroll" data-tab="home" data-scroll="#how-it-works" role="button" tabindex="0">How It Works</a></li>
-  <li><a data-action="tab-scroll" data-tab="home" data-scroll="#pricing" role="button" tabindex="0">Pricing</a></li>
   <li><a href="https://felixagaming.github.io/vibe-quest/" target="_blank" rel="noopener">Vibe Quest</a></li>
   <li><a data-action="tab" data-tab="faq" id="faqNavLink" role="button" tabindex="0">FAQ</a></li>
   <li><a href="https://www.felixagaming.com" target="_blank" rel="noopener" class="nav-social">📺 YouTube · Reddit · Twitch</a></li>
@@ -398,7 +381,6 @@ footer{position:relative;z-index:1;padding:2rem;border-top:1px solid var(--bg-ca
 
 <section id="communities"><div class="container"><div class="section-title reveal">Built for Every Community</div><div class="comm-grid"><div class="comm-box reveal reveal-delay-1"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2z"/><path d="M14 7h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="8" cy="6" r="2"/></svg></div><h3>🎮 Gaming Servers</h3><p>Keep competitive chat fun, not toxic</p></div><div class="comm-box reveal reveal-delay-2"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>👨‍👩‍👧 Family &amp; Kids</h3><p>Protect young members from harmful content</p></div><div class="comm-box reveal reveal-delay-3"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg></div><h3>💼 Professional Communities</h3><p>Maintain brand reputation</p></div><div class="comm-box reveal reveal-delay-1"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><h3>🎓 Education &amp; Study Groups</h3><p>Create safe learning spaces</p></div><div class="comm-box reveal reveal-delay-2"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3-3 3 3"/></svg></div><h3>🎨 Creator Communities</h3><p>Keep your fanbase positive</p></div><div class="comm-box reveal reveal-delay-3"><div class="comm-icon-circle" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div><h3>🤝 Support Communities</h3><p>Ensure members feel heard and safe</p></div></div><div class="reveal reveal-delay-3" style="margin-top:1.5rem"><a href="https://discord.com/oauth2/authorize?client_id=1475337312303841401&permissions=117760&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="btn btn-primary">Add to Your Server</a></div></div></section>
 
-<section id="pricing"><div class="container"><div class="section-title reveal" style="text-align:center">Simple Pricing</div><div class="section-subtitle reveal" style="text-align:center;margin:0 auto">Start free. Upgrade when you need more.</div><div class="pricing-grid"><div class="pricing-card reveal reveal-delay-1"><div class="pricing-name">Free Plan</div><div class="pricing-price">$0</div><div class="pricing-period">Forever free</div><ul class="pricing-features"><li>5 reports total</li><li>Up to 500 messages per scan</li><li>7-day max timeframe</li><li>Basic insights</li></ul><a href="https://discord.com/oauth2/authorize?client_id=1475337312303841401&permissions=117760&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="btn btn-secondary">Add to Discord Free</a></div><div class="pricing-card featured reveal reveal-delay-2"><div class="pricing-badge">Best Value</div><div class="pricing-name">Pro Yearly</div><div class="pricing-price">$99<span style="font-size:1rem;font-weight:400;color:var(--text-dim)">/year</span></div><div class="pricing-period">$8.25/mo — 1 month FREE</div><ul class="pricing-features"><li>Everything in Pro</li><li>1 month FREE</li><li>Best value for serious communities</li></ul><a href="https://buy.stripe.com/YOUR_YEARLY_PLAN_LINK_HERE" target="_blank" rel="noopener" class="btn btn-primary">Go Pro Yearly</a></div><div class="pricing-card reveal reveal-delay-3"><div class="pricing-name">Pro Monthly</div><div class="pricing-price">$8.99<span style="font-size:1rem;font-weight:400;color:var(--text-dim)">/mo</span></div><div class="pricing-period">Cancel anytime</div><ul class="pricing-features"><li>30 reports per month</li><li>Up to 1000 messages per scan</li><li>30-day timeframe</li><li>Custom date ranges</li><li>Priority support</li></ul><a href="https://buy.stripe.com/test_3cI5kF3rtb9U6NFghe4Ni02" target="_blank" rel="noopener" class="btn btn-secondary">Go Pro</a></div></div></div></section>
 
 <section id="quick-faq"><div class="container"><div class="section-title reveal" style="text-align:center">Common Questions</div><div class="faq-list" id="landingFaqList"><div class="faq-item reveal"><button class="faq-question" aria-expanded="false">How does VibeCheck analyze messages?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">We use AI to understand tone and detect harmful patterns — no messages are stored.</div></div><div class="faq-item reveal reveal-delay-1"><button class="faq-question" aria-expanded="false">Is my community's data safe?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Yes. We don't store message content. Only anonymized insights are saved.</div></div><div class="faq-item reveal reveal-delay-2"><button class="faq-question" aria-expanded="false">What permissions does the bot need?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Just three: View Channels, Read Message History, and Send Messages. The invite link includes all three automatically.</div></div><div class="faq-item reveal reveal-delay-3"><button class="faq-question" aria-expanded="false">Can I customize sensitivity?<span class="faq-arrow" aria-hidden="true">▾</span></button><div class="faq-answer">Yes — choose Low (gaming), Medium (general), or High (kids/family) to match your community.</div></div></div><div style="text-align:center;margin-top:1.5rem" class="reveal reveal-delay-4"><a data-action="tab" data-tab="faq" class="btn btn-secondary" role="button" tabindex="0">📖 Full Troubleshooting &amp; FAQ Guide →</a></div></div></section>
 
@@ -516,7 +498,6 @@ footer{position:relative;z-index:1;padding:2rem;border-top:1px solid var(--bg-ca
 <ul class="footer-links">
   <li><a data-action="tab" data-tab="home" role="button" tabindex="0">Home</a></li>
   <li><a data-action="tab-scroll" data-tab="home" data-scroll="#features" role="button" tabindex="0">Features</a></li>
-  <li><a data-action="tab-scroll" data-tab="home" data-scroll="#pricing" role="button" tabindex="0">Pricing</a></li>
   <li><a data-action="tab" data-tab="faq" role="button" tabindex="0">FAQ</a></li>
   <li><a href="https://www.felixagaming.com" target="_blank" rel="noopener">FelixaGaming</a></li>
   <li><a href="mailto:go@vibecheckbot.com">Contact</a></li>
